@@ -40,7 +40,7 @@ export default async function Home() {
       return (
         <>
           <Nav user={safeUser} />
-          <section className="px-1 md:px-5 mt-20">
+          <section className="px-1 md:px-5 sm:mt-20 mt-17">
           {user?.role == "user" ? <UserHomePage /> : ""}
           </section>
         </>

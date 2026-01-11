@@ -5,6 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Default CSS Overried */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 a{
     text-decoration: none !important;
 }
