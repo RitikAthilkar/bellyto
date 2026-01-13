@@ -6,7 +6,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Package, Search, ShoppingCartIcon, User } from 'lucide-react';
+
+import { Clipboard, ClipboardCheck, LogOut, Menu, MenuSquareIcon, Package, Package2, PlusCircle, Search, ShoppingCartIcon, User } from 'lucide-react';
 import {AnimatePresence, motion} from 'motion/react'
 import userlogo from '@/asset/image/element/user2.png'
 import Badge from "@mui/material/Badge";
@@ -14,6 +15,8 @@ import mongoose from 'mongoose';
 import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
+import Sidebar from './admin/sidebar';
+import { useRouter } from 'next/navigation';
        interface IUser {
          _id?: mongoose.Types.ObjectId;
          email: string;
@@ -25,58 +28,109 @@ import { signOut } from 'next-auth/react';
        }
 const Nav = ({user}:{user:IUser}) => {
     const [showsearch, setShowSearch] = useState(false)
+      const [open, setOpen] = useState(false);
+      
+      
+
   return (
     <>
       <div className="w-screen fixed top-2 px-1 md:px-5">
-        <nav className=" rounded-2xl  bg-linear-to-t from-purple-800 to-purple-500 flex  justify-between items-center sm:h-15 h-14">
+        <nav className=" rounded-lg  bg-linear-to-t from-purple-800 to-purple-500 flex  justify-between items-center sm:h-15 h-14">
           <div className="flex items-center">
             <Link
               href={"/"}
-              className="text-white text-xl md:text-3xl font-bold px-3 md:px-5 p-3 ">
+              className="text-white  text-xl md:text-3xl  font-bold px-3 md:px-5 p-3 ">
               Bellyto
             </Link>
-            <form className="hidden md:flex items-center p-2 px-3 rounded-full h-10 bg-white w-xl mx-4">
-              <Search />
-              <input
-                type="text"
-                placeholder="Search for fruits, snacks and more..."
-                className="ms-3 text-lg w-full"
-              />
-            </form>
+            {user?.role == "user" && (
+              <>
+                <form className="hidden md:flex items-center p-2 px-3 rounded-full h-10 bg-white w-xl mx-4">
+                  <Search />
+                  <input
+                    type="text"
+                    placeholder="Search for fruits, snacks and more..."
+                    className="ms-3 text-lg w-full"
+                  />
+                </form>
 
-            <div className="hidden sm:block">
-              <h2 className="text-sm text-white font-bold">Deliver To</h2>
-              <h2 className="text-base text-white font-bold">
-                Bhandara 441904
-              </h2>
-            </div>
+                <div className="hidden sm:block">
+                  <h2 className="text-sm text-white font-bold">Deliver To</h2>
+                  <h2 className="text-base text-white font-bold">
+                    Bhandara 441904
+                  </h2>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex items-center px-2 md:px-5">
-            <Link
-              href={""}
-              className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all md:hidden block"
-              onClick={() => {
-                setShowSearch(!showsearch);
-              }}>
-              <Search className="h-5 text-purple-600" />
-            </Link>
-            <Link
-              href={""}
-              className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all">
-              <Badge
-                badgeContent={4}
-                sx={{
-                  "& .MuiBadge-badge": {
-                    backgroundColor: "#facc15",
-                    color: "#000",
-                  },
-                }}
-                // color="warning"
-              >
-                <ShoppingCartIcon className="h-5 text-purple-600" />
-              </Badge>
-            </Link>
+            {user?.role == "user" && (
+              <>
+                <Link
+                  href={""}
+                  className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all md:hidden block"
+                  onClick={() => {
+                    setShowSearch(!showsearch);
+                  }}>
+                  <Search className="h-5 text-purple-600" />
+                </Link>
 
+                <Link
+                  href={""}
+                  className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all">
+                  <Badge
+                    badgeContent={4}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        backgroundColor: "#facc15",
+                        color: "#000",
+                      },
+                    }}
+                    // color="warning"
+                  >
+                    <ShoppingCartIcon className="h-5 text-purple-600" />
+                  </Badge>
+                </Link>
+              </>
+            )}
+            {user?.role == "admin" && (
+              <>
+                <div className=" px-5 hidden md:block">
+                  <ul className="flex gap-3">
+                    <motion.li
+                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center hover:bg-gray-200 "
+                      whileTap={{ scale: 0.97 }}>
+                      <PlusCircle className="" />
+                      <Link href="/admin/add_grocery/" className=" ms-2">
+                        Add Grocery
+                      </Link>
+                    </motion.li>
+                    <motion.li
+                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
+                      whileTap={{ scale: 0.97 }}>
+                      <Package2 />
+                      <Link href="" className="ms-2">
+                        View Grocery
+                      </Link>
+                    </motion.li>
+                    <motion.li
+                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
+                      whileTap={{ scale: 0.97 }}>
+                      <ClipboardCheck />
+                      <Link href="" className="ms-2">
+                        Manage Order
+                      </Link>
+                    </motion.li>
+                  </ul>
+                </div>
+                <button
+                className='block md:hidden '
+                  onClick={() => {
+                    setOpen(true);
+                  }}>
+                  <Menu className='text-white me-3'/>
+                </button>
+              </>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <motion.div
@@ -103,7 +157,7 @@ const Nav = ({user}:{user:IUser}) => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
-                className="w-56 shadow-2xl rounded-2xl p-2 -translate-x-[35px] bg-white border border-gray-100 w-full"
+                className=" shadow-2xl rounded-2xl p-2 -translate-x-[35px] bg-white border border-gray-100 w-full"
                 sideOffset={5}>
                 <DropdownMenuItem className="flex items-center gap-2 py-2">
                   <div className="relative h-12 w-12 rounded-full border-1 border-gray-200">
@@ -180,6 +234,13 @@ const Nav = ({user}:{user:IUser}) => {
           )}
         </AnimatePresence>
       </div>
+      <Sidebar
+        user={user}
+        open={open}
+        onOpenChange={() => {
+          setOpen(false);
+        }}
+      />
     </>
   );
 }

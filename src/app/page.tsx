@@ -3,7 +3,8 @@ import { auth } from "@/auth";
 import EditMobileRole from "@/components/editMobileRole";
 import Logout from "@/components/logout";
 import Nav from "@/components/nav";
-import UserHomePage from "@/components/userHomePage";
+import UserHomePage from "@/components/user/userHomePage";
+import AdminHomePage from "@/components/admin/adminHomePage";
 import connectDb from "@/config/db";
 import User from "@/models/user.model";
 import { signOut, useSession } from "next-auth/react";
@@ -13,6 +14,7 @@ export default async function Home() {
   await connectDb(); 
 
   const session = await auth()
+  // console.log(session?.user)
    if (!session?.user?.id) {
      redirect("/login");
    }
@@ -39,10 +41,19 @@ export default async function Home() {
     };
       return (
         <>
-          <Nav user={safeUser} />
-          <section className="px-1 md:px-5 sm:mt-20 mt-17">
-          {user?.role == "user" ? <UserHomePage /> : ""}
-          </section>
+          {user?.role == "user" && (
+            <>
+              <Nav user={safeUser} />
+              <section className="px-1 md:px-5 sm:mt-20 mt-17">
+                <UserHomePage />
+              </section>
+            </>
+          )}
+          {user?.role == "admin" && (
+            <>
+              <AdminHomePage user={safeUser} />
+            </>
+          )}
         </>
       );
 }

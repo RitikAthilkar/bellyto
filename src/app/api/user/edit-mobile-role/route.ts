@@ -3,6 +3,7 @@ import User from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 import connectDb from "@/config/db";
 import bcrypt from "bcryptjs";
+import { useSession } from "next-auth/react";
 
 export async function POST(req:NextRequest) {
     
@@ -12,8 +13,8 @@ export async function POST(req:NextRequest) {
      const {mobile, role, password} = await req.json();
 
     const session = await auth()
+   
     
-
       const updateData: any = { mobile, role };
 
     if (password) {

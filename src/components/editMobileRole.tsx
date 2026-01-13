@@ -14,7 +14,7 @@ import { redirect, useRouter } from 'next/navigation';
 
 const EditMobileRole = ({ passwordProp }: { passwordProp :boolean}) => {
   const session = useSession();
- 
+   const { update } = useSession();
   const router = useRouter();
   const [selectedrole, setSelectedRole] = useState("");
   const [showpassword, setShowPassword] = useState(false);
@@ -76,6 +76,7 @@ const EditMobileRole = ({ passwordProp }: { passwordProp :boolean}) => {
     try {
       const response = await axios.post("/api/user/edit-mobile-role", form);
       if (response.status == 200) {
+        await update({role:form?.role})
          setLoader(false);
         router.push("/");
       }

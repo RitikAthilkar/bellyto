@@ -1,7 +1,9 @@
+'use client'
 import Image from 'next/image'
 import React from 'react'
 import banner from '@/asset/image/banner/banner.png'
 import Link from 'next/link'
+import {motion}  from 'motion/react'
 
 // grocery images
 import fruits from '@/asset/image/products/grocery/fruits2.png'
@@ -24,7 +26,7 @@ import drinks from "@/asset/image/products/snacks/drinks_juices.png";
 import frozen from "@/asset/image/products/snacks/frozen_food.png";
 import icecream from "@/asset/image/products/snacks/icecream.png";
 import noodle from "@/asset/image/products/snacks/noodle_pasta.png";
-import pasta from "@/asset/image/products/snacks/sweet_corner.png";
+import sweet from "@/asset/image/products/snacks/sweet_corner.png";
 
 //Beauty and wellness
 import baby from "@/asset/image/products/beauty_wellness/baby_care.png";
@@ -43,40 +45,56 @@ import skin from "@/asset/image/products/beauty_wellness/skin_care.png";
 const UserHomePage = () => {
 
     const grocery = [
-        {image:fruits,lable:'Fresh Fruits'},
-        {image:vegitable,lable:'Fresh vegitables'},
-        {image:exotic,lable:'Exotic Fruits'},
-        {image:milk,lable:'Dairy, Bread And Eggs'},
-        {image:atta,lable:'atta, rice and dal'},
-        {image:breakfast,lable:'Cereals and BreakFast'},
-        {image:dryfruit,lable:'Dry Fruits'},
-        {image:busicuit,lable:'biscuits and cakes'},
-        {image:masala,lable:'masalas'},
-        {image:oil,lable:'oil and ghee'},
-        {image:sauce,lable:'sauces and spreads'},
-        {image:tea,lable:'Tea and coffee drinks'},
-    ]
+      { value: "fruits", image: fruits, label: "Fresh Fruits" },
+      { value: "vegetables", image: vegitable, label: "Fresh Vegetables" },
+      { value: "exotic_fruits", image: exotic, label: "Exotic Fruits" },
+      { value: "dairy_bread_eggs", image: milk, label: "Dairy, Bread & Eggs" },
+      { value: "flour_grains", image: atta, label: "Flour & Grains" },
+      {
+        value: "cereals_breakfast",
+        image: breakfast,
+        label: "Cereals & Breakfast",
+      },
+      { value: "dry_fruits", image: dryfruit, label: "Dry Fruits" },
+      { value: "biscuits_cakes", image: busicuit, label: "Biscuits & Cakes" },
+      { value: "masalas", image: masala, label: "Masalas & Spices" },
+      { value: "oil_ghee", image: oil, label: "Oil & Ghee" },
+      { value: "tea_coffee_drinks", image: tea, label: "Tea & Coffee Drinks" },
+      { value: "sauces_spreads", image: sauce, label: "Sauces & Spreads" },
+    ];
     const snack = [
-      { image: chocolate, lable: "Chocolates" },
-      { image: icecream, lable: "ice creams" },
-      { image: chips, lable: "Chips and namkeens" },
-      { image: drinks, lable: "cold drinks and juices" },
-      { image: noodle, lable: "noodle and pasta" },
-      { image: frozen, lable: "frozen food" },
-      { image: pasta, lable: "sweet corner" },
 
+      { value: "chocolates", image: chocolate, label: "Chocolates" },
+      { value: "ice_creams", image: icecream, label: "Ice Creams" },
+      {
+        value: "chips_namkeen",
+        image: icecream,
+        label: "Chips and namkeens",
+      },
+      {
+        value: "cold_drinks_juices",
+        image: drinks,
+        label: "Cold Drinks & Juices",
+      },
+      { value: "noodle_pasta", image: noodle, label: "Noodles & Pasta" },
+      { value: "sweet_corner", image: sweet, label: "Sweet Corner" },
+      { value: "frozen_food", image: frozen, label: "Frozen Food" },
     ];
     const beauty = [
-      { image: body, lable: "Bath ad body" },
-      { image: hair, lable: "hare care" },
-      { image: skin, lable: "skin care" },
-      { image: oralcare, lable: "Oral care" },
-      { image: makeup, lable: "makeup" },
-      { image: baby, lable: "baby care" },
-      { image: fregrance, lable: "Fregrances" },
-      { image: protien, lable: "whey protien" },
-      { image: pharma, lable: "health and pharma" },
-     
+   
+      { value: "body_care", image: body, label: "Body Care" },
+      { value: "hair_care", image: hair, label: "Hair Care" },
+      { value: "skin_care", image: skin, label: "Skin Care" },
+      { value: "oral_care", image: oralcare, label: "Oral Care" },
+      { value: "makeup", image: makeup, label: "Makeup" },
+      { value: "baby_care", image: baby, label: "Baby Care" },
+      { value: "fragrances", image: fregrance, label: "Fragrances" },
+      {
+        value: "protein_supplements",
+        image: protien,
+        label: "Protein Supplements",
+      },
+      { value: "health_pharma", image: pharma, label: "Health & Pharma" },
     ];
   return (
     <>
@@ -86,16 +104,17 @@ const UserHomePage = () => {
         <div className="grid grid-cols-18 mt-2 ">
           {grocery.map((item, index) => {
             return (
-              <div
+              <motion.div
+                whileHover={{ scale: 1.1 }}
                 key={index}
-                className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer">
+                className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer ">
                 <Image
                   alt="grocery image"
                   src={item.image}
-                  className="w-30 rounded-2xl"
+                  className="w-30 rounded-2xl "
                 />
-                <h2 className="text-sm capitalize mt-1 ">{item.lable}</h2>
-              </div>
+                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
+              </motion.div>
             );
           })}
         </div>
@@ -105,7 +124,8 @@ const UserHomePage = () => {
         <div className="grid grid-cols-18 mt-2 ">
           {snack.map((item, index) => {
             return (
-              <div
+              <motion.div
+                whileHover={{ scale: 1.1 }}
                 key={index}
                 className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer">
                 <Image
@@ -113,8 +133,8 @@ const UserHomePage = () => {
                   src={item.image}
                   className="w-30 rounded-2xl"
                 />
-                <h2 className="text-sm capitalize mt-1 ">{item.lable}</h2>
-              </div>
+                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
+              </motion.div>
             );
           })}
         </div>
@@ -124,7 +144,8 @@ const UserHomePage = () => {
         <div className="grid grid-cols-18 mt-2 ">
           {beauty.map((item, index) => {
             return (
-              <div
+              <motion.div
+                whileHover={{ scale: 1.1 }}
                 key={index}
                 className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer">
                 <Image
@@ -132,8 +153,8 @@ const UserHomePage = () => {
                   src={item.image}
                   className="w-30 rounded-2xl"
                 />
-                <h2 className="text-sm capitalize mt-1 ">{item.lable}</h2>
-              </div>
+                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
+              </motion.div>
             );
           })}
         </div>

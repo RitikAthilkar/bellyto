@@ -1,0 +1,24 @@
+async function uploadImage(file) {
+  // 1. Get pre-signed URL
+  const res = await fetch("/api/upload-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      filename: file.name,
+      filetype: file.type,
+    }),
+  });
+
+  const { signedUrl } = await res.json();
+
+  // 2. Upload the image directly to S3
+  await fetch(signedUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+  });
+
+  alert("Upload successful!");
+}

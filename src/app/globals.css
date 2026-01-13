@@ -20,6 +20,13 @@ a{
 input:focus{
    outline:none !important;
 }
+.css-t3ipsp-control{
+    border-color: rgb(200, 197, 197) !important;
+    box-shadow:  none !important;
+}
+.react-tooltip {
+  z-index: 9999 !important;
+}
 /* END Default CSS Overried */
 
 /* Button CSS */
