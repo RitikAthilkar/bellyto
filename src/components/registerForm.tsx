@@ -9,7 +9,7 @@ import { User, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 import toast from "react-hot-toast";
 
 import Google from '@/asset/image/element/google.png'
-import registerbg from '@/asset/image/element/register-bg.png'
+import registerbg from '@/asset/image/element/register-bg2.png'
 type propType={
   nextstep:(s:number)=>void 
 }
@@ -111,7 +111,7 @@ type FormType = {
                   transition={{
                     duration: 0.5,
                   }}>
-                  <h2 className="text-purple-600 text-2xl font-bold">
+                  <h2 className="text-green-600 text-2xl font-bold">
                     Create Account
                   </h2>
                   {/* {JSON.stringify(form)}
@@ -208,7 +208,7 @@ type FormType = {
                   <p className="text-sm mt-5">
                     Already have account ?{" "}
                     <span
-                      className="text-purple-600 font-bold cursor-pointer"
+                      className="text-green-600 font-bold cursor-pointer"
                       onClick={() => {
                         router.push("/login");
                       }}>

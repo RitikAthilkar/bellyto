@@ -28,7 +28,7 @@ const Loading = ({ nextstep }: propType) => {
   // Offline Screen
   if (!online) {
     return (
-      <div className="w-full min-h-screen bg-gradient-to-t from-purple-900 to-purple-600 flex flex-col items-center justify-center text-center px-6">
+      <div className="w-full min-h-screen bg-gradient-to-t from-green-700 to-green-500 flex flex-col items-center justify-center text-center px-6">
         <Image src={grocery} alt="Bellyto" width={80} height={80} priority />
 
         <h1 className="mt-4 text-xl font-semibold text-white">
@@ -50,14 +50,13 @@ const Loading = ({ nextstep }: propType) => {
 
   // Loading Screen
   return (
-    <div className="w-full min-h-screen bg-gradient-to-t from-purple-900 to-purple-600 flex flex-col items-center justify-center">
- 
+    <div className="w-full min-h-screen bg-gradient-to-t from-green-700 to-green-500 flex flex-col items-center justify-center">
       <div className="relative flex items-center justify-center mt-5">
-        <div className="h-10 w-10 rounded-full border-2 border-white/30"></div>
-        <div className="absolute h-10 w-10 rounded-full border-2 border-yellow-400 border-t-transparent animate-spin"></div>
+        <div className="h-17 w-17 rounded-full border-2 border-white/30"></div>
+        <div className="absolute h-20 w-20 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
       </div>
 
-      <p className="mt-4 text-white/90 text-lg">Loading...</p>
+      <p className="mt-6 text-white/90 text-xl">Loading</p>
     </div>
   );
 };

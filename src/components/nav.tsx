@@ -1,5 +1,5 @@
 'use client'
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,6 +17,10 @@ import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import Sidebar from './admin/sidebar';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import axios from 'axios';
+import { setCartData } from '@/redux/cartSlice';
        interface IUser {
          _id?: mongoose.Types.ObjectId;
          email: string;
@@ -29,13 +33,27 @@ import { useRouter } from 'next/navigation';
 const Nav = ({user}:{user:IUser}) => {
     const [showsearch, setShowSearch] = useState(false)
       const [open, setOpen] = useState(false);
-      
-      
+       const { cartData } = useSelector((state: RootState) => state.cart);
+      const dispatch = useDispatch<AppDispatch>()
+       useEffect(()=>{
+            const GetCartData = async()=>{
+              try {
+              const response = await axios.get('/api/user/addtocart')
+              dispatch(setCartData(response.data))
+                console.log("backend data", response.data)
+              } catch (error) {
+                console.log("cart data fetch error ", error);
+              }
+            }
+          GetCartData();
+       },[])
 
   return (
     <>
-      <div className="w-screen fixed top-2 px-1 md:px-5">
-        <nav className=" rounded-lg  bg-linear-to-t from-purple-800 to-purple-500 flex  justify-between items-center sm:h-15 h-14">
+      <div
+        className="w-screen  top-1 px-1 md:px-5 sticky  z-[99999] "
+        id="navbar">
+        <nav className=" rounded-lg  bg-linear-to-t from-green-700 to-green-500 flex  justify-between items-center sm:h-15 h-14">
           <div className="flex items-center">
             <Link
               href={"/"}
@@ -78,7 +96,7 @@ const Nav = ({user}:{user:IUser}) => {
                   href={""}
                   className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all">
                   <Badge
-                    badgeContent={4}
+                    badgeContent={cartData?.length}
                     sx={{
                       "& .MuiBadge-badge": {
                         backgroundColor: "#facc15",
@@ -92,45 +110,7 @@ const Nav = ({user}:{user:IUser}) => {
                 </Link>
               </>
             )}
-            {user?.role == "admin" && (
-              <>
-                <div className=" px-5 hidden md:block">
-                  <ul className="flex gap-3">
-                    <motion.li
-                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center hover:bg-gray-200 "
-                      whileTap={{ scale: 0.97 }}>
-                      <PlusCircle className="" />
-                      <Link href="/admin/add_grocery/" className=" ms-2">
-                        Add Grocery
-                      </Link>
-                    </motion.li>
-                    <motion.li
-                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
-                      whileTap={{ scale: 0.97 }}>
-                      <Package2 />
-                      <Link href="" className="ms-2">
-                        View Grocery
-                      </Link>
-                    </motion.li>
-                    <motion.li
-                      className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
-                      whileTap={{ scale: 0.97 }}>
-                      <ClipboardCheck />
-                      <Link href="" className="ms-2">
-                        Manage Order
-                      </Link>
-                    </motion.li>
-                  </ul>
-                </div>
-                <button
-                className='block md:hidden '
-                  onClick={() => {
-                    setOpen(true);
-                  }}>
-                  <Menu className='text-white me-3'/>
-                </button>
-              </>
-            )}
+        
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <motion.div

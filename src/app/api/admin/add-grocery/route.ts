@@ -45,6 +45,8 @@ export async function POST(req:NextRequest){
             if(file){
              imageurl = await uploadOnCloudinary(file)
             }
+               
+              const discountpercent =Math.round(((Number(mrp) - Number(price)) / Number(mrp)) * 100)
 
 
                 function generateSKU(name: string, unitquantity: string, unit:string) {
@@ -69,6 +71,7 @@ export async function POST(req:NextRequest){
                         brand,
                         price,
                         mrp,
+                        discountpercent,
                         unit,
                         unitquantity,
                         tag,

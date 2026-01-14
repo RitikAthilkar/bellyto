@@ -10,7 +10,7 @@ import mongoose from "mongoose"
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import toast from "react-hot-toast";
-const page = () => {
+const AddGrocery = () => {
   interface formState {
     _id?: mongoose.Types.ObjectId;
     name: string;
@@ -56,7 +56,6 @@ const stockRef = useRef<any>(null);
   const category = [
     { value: "fruits", label: "Fresh Fruits" },
     { value: "vegetables", label: "Fresh Vegetables" },
-    { value: "exotic_fruits", label: "Exotic Fruits" },
     { value: "dairy_bread_eggs", label: "Dairy, Bread & Eggs" },
     { value: "flour_grains", label: "Flour & Grains" },
     { value: "cereals_breakfast", label: "Cereals & Breakfast" },
@@ -254,19 +253,8 @@ const handleSelect = (selected: Option | null) => {
   return (
     <>
       <Tooltip id="tooltipID" />
-      <div className="min-h-screen bg-gray-100  flex flex-col justify-start items-center px-3 pb-20">
-        <div className="flex items-center justify-between  w-full">
-          <Link
-            href={"/"}
-            className="text-purple-600  text-xl md:text-3xl  font-bold px-3 md:px-5 p-3 ">
-            Bellyto
-          </Link>
-          <Link
-            href={"/"}
-            className="text-purple-600   text-xl md:text-lg  font-bold px-3 md:px-5 p-3 ">
-            Back
-          </Link>
-        </div>
+      <div className=" flex flex-col justify-start items-center px-3 pb-20 mt-10">
+       
         {/* <div className="">{JSON.stringify(products)}</div> */}
         {/* <div className="">{JSON.stringify(productForm)}</div> */}
         {/* <div className="">{JSON.stringify(form)}</div> */}
@@ -275,7 +263,7 @@ const handleSelect = (selected: Option | null) => {
             handleSubmit(e);
           }}
           className="bg-white border border-gray-200 w-full sm:w-[50vw] p-4 flex flex-col justify-center items-center  rounded-2xl shadow-2xl">
-          <h2 className="text-2xl text-purple-600 font-bold ">
+          <h2 className="text-2xl text-green-600 font-bold ">
             Add Grocery Form
           </h2>
           <div className="grid grid-cols-12 gap-3 w-full mt-2 pt-4 border-t border-gray-300">
@@ -515,7 +503,7 @@ const handleSelect = (selected: Option | null) => {
               {" "}
               <label
                 htmlFor="image"
-                className="bg-purple-200 p-2 text-purple-700 rounded-xl flex items-center font-bold ">
+                className="bg-green-200 p-2 text-green-700 rounded-xl flex items-center font-semibold ">
                 {" "}
                 <Upload className="me-1" /> Upload Product Image{" "}
               </label>{" "}
@@ -559,4 +547,4 @@ const handleSelect = (selected: Option | null) => {
   );
 }
 
-export default page
+export default AddGrocery

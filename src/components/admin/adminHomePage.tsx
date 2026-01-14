@@ -40,8 +40,8 @@ const AdminHomePage = ({user}:{user:IUser}) => {
   return (
     <>
       <div className="min-h-screen w-screen grid grid-cols-10">
-        <div className="min-h-screen bg-purple-800 col-span-2">
-          <div className="h-15 flex justify-center items-center border-b border-purple-600">
+        <div className="min-h-screen bg-green-700 col-span-2 ">
+          <div className="h-15 flex justify-center items-center border-b border-green-600">
             <Link href={"/"} className="text-4xl font-bold text-white">
               Bellyto
             </Link>
@@ -72,7 +72,8 @@ const AdminHomePage = ({user}:{user:IUser}) => {
           </ul>
         </div>
         <div className="min-h-screen col-span-8">
-          <div className="bg-white h-15 flex justify-end p-2 shadow-lg px-5">
+          <div className="bg-white h-15 flex justify-between items-center p-2 shadow-lg px-5">
+            <h2 className='text-xl '>Admin Panel</h2>
             <div className="flex ">
               <div className=" px-3 hidden md:block">
                 <ul className="flex gap-1">
@@ -160,15 +161,10 @@ const AdminHomePage = ({user}:{user:IUser}) => {
                     </div>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem className="flex items-center gap-3 py-2 border-t border-gray-200 px-5">
-                    <Package className="!h-6 !w-6 text-purple-600" />
-                    <span className="!text-base">My Order</span>
-                  </DropdownMenuItem>
-
                   <DropdownMenuItem
-                    className="flex items-center gap-3 py-2 border-t border-gray-200 cursor-pointer px-5"
+                    className="flex items-center gap-3 py-3 border-t border-gray-200 cursor-pointer px-5"
                     onClick={() => signOut()}>
-                    <LogOut className="!h-6 !w-6 text-purple-600" />
+                    <LogOut className="!h-6 !w-6 text-green-600" />
                     <span className="!text-base">Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

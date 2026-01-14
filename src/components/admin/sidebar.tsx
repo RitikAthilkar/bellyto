@@ -30,7 +30,7 @@ const Sidebar = ({user, open, onOpenChange }: {user:IUser, open: boolean; onOpen
           className=" bg-linear-to-t from-purple-800 to-purple-500 border-0 w-60">
           <SheetHeader>
             <SheetTitle className="flex border-b border-gray-300 py-3">
-              <div className="relative h-12 w-12 rounded-full border-1 border-gray-200">
+              <div className="relative h-12 w-12 rounded-full border border-gray-200">
                 {user?.image ? (
                   <Image
                     alt="user image"

@@ -1,6 +1,6 @@
 'use client'
 import React, {useEffect, useState} from 'react'
-import registerbg from '@/asset/image/element/register-bg.png'
+import registerbg from '@/asset/image/element/register-bg2.png'
 import { User, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 import Google from '@/asset/image/element/google.png'
 import { motion } from "motion/react";
@@ -122,7 +122,7 @@ type FormType = {
                   transition={{
                     duration: 0.5,
                   }}>
-                  <h2 className="text-black text-2xl font-bold text-purple-600">
+                  <h2 className="text-black text-2xl font-bold text-green-600">
                     Login In
                   </h2>
                   {/* {JSON.stringify(form)}
@@ -215,7 +215,7 @@ type FormType = {
                   <p className="text-sm mt-5">
                     Create account ?{" "}
                     <span
-                      className="text-purple-600 font-bold cursor-pointer"
+                      className="text-green-600 font-bold cursor-pointer"
                       onClick={() => {
                         router.push("/register");
                       }}>

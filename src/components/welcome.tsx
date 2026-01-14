@@ -10,7 +10,8 @@ type propType={
 const Welcome = ({nextstep}:propType) => {
   return (
     <>
-      <div className="w-full min-h-screen bg-linear-to-t from-purple-800 to-purple-500 flex flex-col justify-center items-center">
+      {/* from-purple-800 to-purple-500 */}
+      <div className="w-full min-h-screen bg-linear-to-t from-green-700 to-green-500 flex flex-col justify-center items-center">
         <motion.div
           initial={{
             y: -20,

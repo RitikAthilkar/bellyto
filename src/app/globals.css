@@ -4,6 +4,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+body{
+    overflow-x: hidden;
+
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
 /* Default CSS Overried */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -20,6 +30,8 @@ a{
 input:focus{
    outline:none !important;
 }
+
+
 .css-t3ipsp-control{
     border-color: rgb(200, 197, 197) !important;
     box-shadow:  none !important;

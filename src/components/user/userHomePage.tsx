@@ -38,16 +38,41 @@ import oralcare from "@/asset/image/products/beauty_wellness/oral_care.png";
 import pharma from "@/asset/image/products/beauty_wellness/pharma_medicine.png";
 import protien from "@/asset/image/products/beauty_wellness/protien_suppliments.png";
 import skin from "@/asset/image/products/beauty_wellness/skin_care.png";
+import mongoose from 'mongoose'
+import { Star } from 'lucide-react'
+import GroceryItemCard from './groceryItemCard'
 
 
 
+       interface IProduct {
+_id?:mongoose.Types.ObjectId,
+    name:string,
+    sku:string,
+    description:string,
+    category:string,
+    subcategory:string,
+    brand:string,
+    price:string,
+    mrp:string,
+    unitquantity:string,
+    unit:string,
+    image?:string,
+    stockquantity:number,
+    isavailable?:boolean,
+    discountpercent?:string,
+    rating?:string,
+    reviewcount?:string,
+    deliverytime?:string,
+    expirydate?:Date,
+    tag:string
 
-const UserHomePage = () => {
-
+       }
+const UserHomePage = ({products}:{products:IProduct[]}) => {
+  
+    
     const grocery = [
       { value: "fruits", image: fruits, label: "Fresh Fruits" },
       { value: "vegetables", image: vegitable, label: "Fresh Vegetables" },
-      { value: "exotic_fruits", image: exotic, label: "Exotic Fruits" },
       { value: "dairy_bread_eggs", image: milk, label: "Dairy, Bread & Eggs" },
       { value: "flour_grains", image: atta, label: "Flour & Grains" },
       {
@@ -56,21 +81,16 @@ const UserHomePage = () => {
         label: "Cereals & Breakfast",
       },
       { value: "dry_fruits", image: dryfruit, label: "Dry Fruits" },
-      { value: "biscuits_cakes", image: busicuit, label: "Biscuits & Cakes" },
+
       { value: "masalas", image: masala, label: "Masalas & Spices" },
       { value: "oil_ghee", image: oil, label: "Oil & Ghee" },
       { value: "tea_coffee_drinks", image: tea, label: "Tea & Coffee Drinks" },
-      { value: "sauces_spreads", image: sauce, label: "Sauces & Spreads" },
+    
     ];
     const snack = [
-
       { value: "chocolates", image: chocolate, label: "Chocolates" },
       { value: "ice_creams", image: icecream, label: "Ice Creams" },
-      {
-        value: "chips_namkeen",
-        image: icecream,
-        label: "Chips and namkeens",
-      },
+      { value: "biscuits_cakes", image: busicuit, label: "Biscuits & Cakes" },
       {
         value: "cold_drinks_juices",
         image: drinks,
@@ -79,6 +99,12 @@ const UserHomePage = () => {
       { value: "noodle_pasta", image: noodle, label: "Noodles & Pasta" },
       { value: "sweet_corner", image: sweet, label: "Sweet Corner" },
       { value: "frozen_food", image: frozen, label: "Frozen Food" },
+      { value: "sauces_spreads", image: sauce, label: "Sauces & Spreads" },
+      {
+        value: "chips_namkeen",
+        image: chips,
+        label: "Chips and namkeens",
+      },
     ];
     const beauty = [
    
@@ -96,88 +122,105 @@ const UserHomePage = () => {
       },
       { value: "health_pharma", image: pharma, label: "Health & Pharma" },
     ];
+
+
+
+
   return (
     <>
-      <Image alt="banner image" src={banner} className="w-screen" />
-      <div className="mt-5 overflow-x-auto scrollbar-hide">
-        <h2 className="text-xl font-semibold">Grocery & Kitchen</h2>
-        <div className="grid grid-cols-18 mt-2 ">
-          {grocery.map((item, index) => {
-            return (
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                key={index}
-                className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer ">
-                <Image
-                  alt="grocery image"
-                  src={item.image}
-                  className="w-30 rounded-2xl "
-                />
-                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
-              </motion.div>
-            );
-          })}
+      <div className="pb-100">
+        <Image alt="banner image" src={banner} className="w-screen" />
+        <div id="category-div">
+          <div className="mt-5 overflow-x-auto scrollbar-hide">
+            <h2 className="text-sm sm:text-xl font-semibold">
+              Grocery & Kitchen
+            </h2>
+            <div className="grid grid-cols-18 mt-2 ">
+              {grocery.map((item, index) => {
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.5 }}
+                    transition={{
+                      duration: 0.6,
+                    }}
+                    key={index}
+                    className="col-span-6 sm:col-span-2 flex justify-center items-center flex-col   mt-2 cursor-pointer ">
+                    <Image
+                      alt="grocery image"
+                      src={item.image}
+                      className="w-15 sm:w-30 rounded-2xl "
+                    />
+                    <h2 className="text-xs sm:text-sm capitalize mt-1 text-center">
+                      {item.label}
+                    </h2>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-5 overflow-x-auto scrollbar-hide">
+            <h2 className="text-sm sm:text-xl font-semibold">
+              Snacks & Drinks
+            </h2>
+            <div className="grid grid-cols-18 mt-2 ">
+              {snack.map((item, index) => {
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.5 }}
+                    transition={{
+                      duration: 0.6,
+                    }}
+                    key={index}
+                    className="col-span-6 sm:col-span-2 flex justify-center items-center flex-col   mt-2 cursor-pointer ">
+                    <Image
+                      alt="grocery image"
+                      src={item.image}
+                      className="w-15 sm:w-30 rounded-2xl "
+                    />
+                    <h2 className="text-xs sm:text-sm capitalize mt-1 text-center">
+                      {item.label}
+                    </h2>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-5 overflow-x-auto scrollbar-hide">
+            <h2 className="text-sm sm:text-xl font-semibold">
+              Beauty & Wellness
+            </h2>
+            <div className="grid grid-cols-18 mt-2 ">
+              {beauty.map((item, index) => {
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.5 }}
+                    transition={{
+                      duration: 0.6,
+                    }}
+                    key={index}
+                    className="col-span-6 sm:col-span-2 flex justify-center items-center flex-col   mt-2 cursor-pointer ">
+                    <Image
+                      alt="grocery image"
+                      src={item.image}
+                      className="w-15 sm:w-30 rounded-2xl "
+                    />
+                    <h2 className="text-xs sm:text-sm capitalize mt-1 text-center">
+                      {item.label}
+                    </h2>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
         </div>
+        <GroceryItemCard products={products}/>
       </div>
-      <div className="mt-5 overflow-x-auto scrollbar-hide">
-        <h2 className="text-xl font-semibold">Snacks & Drinks</h2>
-        <div className="grid grid-cols-18 mt-2 ">
-          {snack.map((item, index) => {
-            return (
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                key={index}
-                className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer">
-                <Image
-                  alt="grocery image"
-                  src={item.image}
-                  className="w-30 rounded-2xl"
-                />
-                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="mt-5 overflow-x-auto scrollbar-hide">
-        <h2 className="text-xl font-semibold">Beauty & Wellness</h2>
-        <div className="grid grid-cols-18 mt-2 ">
-          {beauty.map((item, index) => {
-            return (
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                key={index}
-                className="col-span-2 flex justify-center items-center flex-col  w-40 mt-2 cursor-pointer">
-                <Image
-                  alt="grocery image"
-                  src={item.image}
-                  className="w-30 rounded-2xl"
-                />
-                <h2 className="text-sm capitalize mt-1 ">{item.label}</h2>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-      {/* <div className="mt-5 overflow-x-auto scrollbar-hide">
-        <h2 className="text-xl font-semibold">Grocery & Kitchen</h2>
-        <div className="flex gap-4 w-max mt-2">
-          {grocery.map((item, index) => {
-            return (
-              <div
-                key={index}
-                className="flex justify-center items-center flex-col  w-40">
-                <Image
-                  alt="grocery image"
-                  src={item.image}
-                  className="w-30 rounded-2xl"
-                />
-                <h2 className="text-sm capitalize">{item.lable}</h2>
-              </div>
-            );
-          })}
-        </div>
-      </div> */}
     </>
   );
 }

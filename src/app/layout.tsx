@@ -6,6 +6,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // import "bootstrap/dist/css/bootstrap.min.css";
 import toast, { Toaster } from "react-hot-toast";
 import Provider from "@/provider";
+import StoreProvider from "@/redux/StoreProvider";
+import Loginuserdata from "@/loginuserdata";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -25,7 +27,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <Provider>{children}</Provider>
+        <Provider>
+          <StoreProvider>
+            
+          <Loginuserdata/>
+            {children}
+            
+          </StoreProvider>
+        </Provider>
         <Toaster
           position="top-center"
           toastOptions={{

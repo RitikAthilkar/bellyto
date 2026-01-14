@@ -16,7 +16,7 @@ interface Igrocery {
     unit:string,
     image?:string,
     stockquantity:number,
-    isavailable?:boolean,
+    isavailable:boolean,
     discountpercent?:string,
     rating?:string,
     reviewcount?:string,
@@ -115,7 +115,7 @@ const GrocerySchema = new mongoose.Schema<Igrocery>({
      },
      isavailable:{
         type:Boolean,
-        required:false
+        required:true
      },
      discountpercent:{
         type:String,
