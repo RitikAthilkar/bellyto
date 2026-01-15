@@ -8,9 +8,13 @@ import {
 } from "@/components/ui/sheet";
 import mongoose, { Mongoose } from 'mongoose';
 import Image from 'next/image';
-
+import { RootState } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateQuantity, setCartData } from "@/redux/cartSlice";
+import axios from 'axios';
+import { Minus, Plus } from 'lucide-react';
  interface IProduct {
-_id?:mongoose.Types.ObjectId,
+_id:mongoose.Types.ObjectId,
     name:string,
     sku:string,
     description:string,
@@ -42,13 +46,41 @@ const GroceryDetailCard = ({
   onOpenChange:()=>void
 }) => {
 
- const  handleAddToCart=async(id:mongoose.Types.ObjectId)=> {
-       try {
-           console.log("product id ", id)
-       } catch (error) {
-          console.log(error)
+
+  const {cartData} = useSelector((state:RootState)=>state.cart)
+
+  const dispatch = useDispatch()
+
+
+   const handleQuantity = async (action: string, id: string) => {
+     try {
+       const response = await axios.patch("/api/user/addtocart", {
+         productId: id,
+         action: action,
+       });
+       if (action == "increase") {
+         dispatch(updateQuantity({ action: "increase", id }));
+       } else {
+         dispatch(updateQuantity({ action: "decrease", id }));
        }
-  }
+     } catch (error) {
+       console.log("handle quantity error");
+     }
+   };
+      const handleAddToCart = async (id: mongoose.Types.ObjectId) => {
+        try {
+          const response = await axios.post("/api/user/addtocart", {
+            id: id,
+            quantity: 1,
+          });
+
+          dispatch(setCartData(response.data));
+        } catch (error) {
+          console.log(" Server error ", error);
+        }
+      };
+
+      const cartItem = cartData?.find((c) => c._id === item?._id.toString());
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -79,7 +111,7 @@ const GroceryDetailCard = ({
                           {item.description}
                         </p>
                         <p className="mt-2 text-base text-gray-500">
-                          {item.subcategory} • Tag: {item.tag}
+                          {item.subcategory} • {item.tag}
                         </p>
                         <p className="text-base text-gray-500 mt-1">
                           Brand: {item.brand}
@@ -146,14 +178,43 @@ const GroceryDetailCard = ({
                         )}
                       </div>
 
-                      <div className="flex justify-between items-center">
-                        <button className="mt-5 text-green-700 font-medium text-md  rounded-lg  transition">
-                         View Product Details <i className='bi bi-caret-down-fill'></i>
-                        </button>
-                        <button className="mt-5 text-md bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition">
-                          Add to Cart
-                        </button>
-                      </div>
+                      {cartItem && cartItem.cartquantity<=0 ? (
+                        <>
+                          <div className="flex justify-between items-center">
+                            <button className="mt-5 text-green-700 font-medium text-md  rounded-lg  transition">
+                              View Product Details{" "}
+                              <i className="bi bi-caret-down-fill"></i>
+                            </button>
+                            <button
+                              onClick={() => {
+                                handleAddToCart(item._id);
+                              }}
+                              className="mt-5 text-md bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition">
+                              Add to Cart
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bg-green-50  rounded-sm  flex justify-center items-center p-1 w-30 mt-1">
+                            <button
+                              onClick={() => {
+                                handleQuantity("decrease", item._id.toString());
+                              }}
+                              className="bg-green-200 text-green-600 rounded-sm mx-3">
+                              <Minus className="h-5 w-5" />
+                            </button>
+                            <span>{cartItem?.cartquantity}</span>
+                            <button
+                              onClick={() => {
+                                handleQuantity("increase", item._id.toString());
+                              }}
+                              className="bg-green-200 text-green-600 rounded-sm mx-3">
+                              <Plus className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="col-span-4  p-3">

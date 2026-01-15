@@ -4,7 +4,7 @@ import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { Tooltip } from "react-tooltip";
 import Link from 'next/link';
-import { Upload } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import axios from 'axios';
 import mongoose from "mongoose"
 import Image from 'next/image';
@@ -52,36 +52,36 @@ const [products, setProducts] = useState<Option[]>([]);
 const [productForm, setProductForm] = useState<formState[]>([]);
 const selectRef = useRef<any>(null);
 const stockRef = useRef<any>(null);
-
-  const category = [
-    { value: "fruits", label: "Fresh Fruits" },
-    { value: "vegetables", label: "Fresh Vegetables" },
-    { value: "dairy_bread_eggs", label: "Dairy, Bread & Eggs" },
-    { value: "flour_grains", label: "Flour & Grains" },
-    { value: "cereals_breakfast", label: "Cereals & Breakfast" },
-    { value: "dry_fruits", label: "Dry Fruits" },
-    { value: "biscuits_cakes", label: "Biscuits & Cakes" },
-    { value: "masalas", label: "Masalas & Spices" },
-    { value: "oil_ghee", label: "Oil & Ghee" },
-    { value: "tea_coffee_drinks", label: "Tea & Coffee Drinks" },
-    { value: "sauces_spreads", label: "Sauces & Spreads" },
-    { value: "chocolates", label: "Chocolates" },
-    { value: "ice_creams", label: "Ice Creams" },
-    { value: "chips_namkeen", label: "Chips & Namkeens" },
-    { value: "cold_drinks_juices", label: "Cold Drinks & Juices" },
-    { value: "noodle_pasta", label: "Noodles & Pasta" },
-    { value: "sweet_corner", label: "Sweet Corner" },
-    { value: "frozen_food", label: "Frozen Food" },
-    { value: "body_care", label: "Body Care" },
-    { value: "hair_care", label: "Hair Care" },
-    { value: "skin_care", label: "Skin Care" },
-    { value: "oral_care", label: "Oral Care" },
-    { value: "makeup", label: "Makeup" },
-    { value: "baby_care", label: "Baby Care" },
-    { value: "fragrances", label: "Fragrances" },
-    { value: "protein_supplements", label: "Protein & Supplements" },
-    { value: "health_pharma", label: "Health & Pharma" },
-  ]; 
+    const [loader, setloader] = useState(false);
+    const category = [
+      { value: "fruits", label: "Fresh Fruits" },
+      { value: "vegetables", label: "Fresh Vegetables" },
+      { value: "dairy_bread_eggs", label: "Dairy, Bread & Eggs" },
+      { value: "flour_grains", label: "Flour & Grains" },
+      { value: "cereals_breakfast", label: "Cereals & Breakfast" },
+      { value: "dry_fruits", label: "Dry Fruits" },
+      { value: "biscuits_cakes", label: "Biscuits & Cakes" },
+      { value: "masalas", label: "Masalas & Spices" },
+      { value: "oil_ghee", label: "Oil & Ghee" },
+      { value: "tea_coffee_drinks", label: "Tea & Coffee Drinks" },
+      { value: "sauces_spreads", label: "Sauces & Spreads" },
+      { value: "chocolates", label: "Chocolates" },
+      { value: "ice_creams", label: "Ice Creams" },
+      { value: "chips_namkeen", label: "Chips & Namkeens" },
+      { value: "cold_drinks_juices", label: "Cold Drinks & Juices" },
+      { value: "noodle_pasta", label: "Noodles & Pasta" },
+      { value: "sweet_corner", label: "Sweet Corner" },
+      { value: "frozen_food", label: "Frozen Food" },
+      { value: "body_care", label: "Body Care" },
+      { value: "hair_care", label: "Hair Care" },
+      { value: "skin_care", label: "Skin Care" },
+      { value: "oral_care", label: "Oral Care" },
+      { value: "makeup", label: "Makeup" },
+      { value: "baby_care", label: "Baby Care" },
+      { value: "fragrances", label: "Fragrances" },
+      { value: "protein_supplements", label: "Protein & Supplements" },
+      { value: "health_pharma", label: "Health & Pharma" },
+    ]; 
 
   const units = [
     { value: "kg", label: "kg" },
@@ -94,7 +94,7 @@ const stockRef = useRef<any>(null);
 
 const notify = (s: string) => toast(s);
   const GetGrocery = async () => {
-
+   
     try {
       const response = await axios.get("/api/admin/add-grocery");
       if(response.status==200){
@@ -104,11 +104,12 @@ const notify = (s: string) => toast(s);
             }));
         setProducts(options);
         setProductForm(response.data);
-       
+      
       }
       // console.log("grocery Data", response.data);
     } catch (error) {
       console.log("grocery Data error", error);
+     
     }
   };
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,8 +125,8 @@ const notify = (s: string) => toast(s);
 
 
 const handleSelect = (selected: Option | null) => {
-
   if (!selected) return;
+  
   const value = selected.value;
   const check = value.split("-");
   
@@ -174,7 +175,7 @@ const handleSelect = (selected: Option | null) => {
 
   const handleSubmit =  async(e:React.FormEvent) => {
      e.preventDefault();
-    //  alert('clicked')
+    setloader(true);
      try {
         const formData  = new FormData();
                     
@@ -213,14 +214,18 @@ const handleSelect = (selected: Option | null) => {
                     stockquantity: 0,
                     tag: "",
                   });
+                  GetGrocery();
                   setPreview('')
                   selectRef.current?.clearValue();
                   stockRef.current.value = "";
+                  setloader(false);
                 }
                 // console.log("grocery Add Data", response);
 
      } catch (error) {
        console.log("grocery Add  Error", error);
+        notify("Something went wrong");
+        setloader(false);
      }
 
   }
@@ -537,7 +542,7 @@ const handleSelect = (selected: Option | null) => {
               <button
                 className="bg-green-500 hover:bg-green-600 p-2 text-white rounded-lg flex items-center px-6  justify-center"
                 type="submit">
-                Add Product
+                {loader?<Loader2 className='animate-spin'/>:"Add Product"}
               </button>
             </div>
           </div>

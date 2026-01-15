@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import axios from 'axios';
 import { setCartData } from '@/redux/cartSlice';
+import GroceryCart from './user/GroceryCart';
        interface IUser {
          _id?: mongoose.Types.ObjectId;
          email: string;
@@ -33,13 +34,17 @@ import { setCartData } from '@/redux/cartSlice';
 const Nav = ({user}:{user:IUser}) => {
     const [showsearch, setShowSearch] = useState(false)
       const [open, setOpen] = useState(false);
+      const [cartshow, setCartShow] = useState(false);
        const { cartData } = useSelector((state: RootState) => state.cart);
       const dispatch = useDispatch<AppDispatch>()
        useEffect(()=>{
             const GetCartData = async()=>{
               try {
               const response = await axios.get('/api/user/addtocart')
-              dispatch(setCartData(response.data))
+              response.data.forEach((i: any) => {
+                dispatch(setCartData(i));
+              });
+              
                 console.log("backend data", response.data)
               } catch (error) {
                 console.log("cart data fetch error ", error);
@@ -92,8 +97,8 @@ const Nav = ({user}:{user:IUser}) => {
                   <Search className="h-5 text-purple-600" />
                 </Link>
 
-                <Link
-                  href={""}
+                <button
+                  onClick={()=>{setCartShow(true)}}
                   className="relative w-9 h-9 sm:w-10 sm:h-10 bg-white flex justify-center items-center rounded-full me-3 transition-all">
                   <Badge
                     badgeContent={cartData?.length}
@@ -107,10 +112,11 @@ const Nav = ({user}:{user:IUser}) => {
                   >
                     <ShoppingCartIcon className="h-5 text-purple-600" />
                   </Badge>
-                </Link>
+              
+                </button>
               </>
             )}
-        
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <motion.div
@@ -219,6 +225,12 @@ const Nav = ({user}:{user:IUser}) => {
         open={open}
         onOpenChange={() => {
           setOpen(false);
+        }}
+      />
+      <GroceryCart
+        open={cartshow}
+        onOpenChange={() => {
+          setCartShow(false);
         }}
       />
     </>

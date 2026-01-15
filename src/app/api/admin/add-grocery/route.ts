@@ -76,7 +76,7 @@ export async function POST(req:NextRequest){
                         unitquantity,
                         tag,
                         image: imageurl ?? undefined,
-                        isAvailable: true,
+                       
                     },
                     $inc: { stockquantity: parseInt(stockquantity) || 0 },
                     },
@@ -99,7 +99,7 @@ export async function POST(req:NextRequest){
                     tag,
                     image: imageurl ?? undefined,
                     stockquantity,
-                    isAvailable: true,
+                   
                 });
                 }
 

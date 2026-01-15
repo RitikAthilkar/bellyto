@@ -42,6 +42,7 @@ export default function RootLayout({
             duration: 5000,
             removeDelay: 1000,
           }}
+        
         />
       </body>
     </html>

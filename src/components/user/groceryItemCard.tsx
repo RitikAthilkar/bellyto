@@ -259,8 +259,10 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
    const  handleAddToCart=async(id:mongoose.Types.ObjectId)=> {
          try {
 
-            const response = await axios.post('/api/user/addtocart',{id:id,quantity:quantity})
-            dispatch(setCartData(response.data));
+            const response = await axios.post('/api/user/addtocart',{id:id,quantity:1})
+    
+             dispatch(setCartData(response.data));
+       
            
          } catch (error) {
            console.log(" Server error ", error);
@@ -268,7 +270,7 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
     }
    const handleQuantity = async (
      action:string,
-     id: mongoose.Types.ObjectId
+     id: string
    ) => {
          
      try {
@@ -304,10 +306,11 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
             const cartItem = cartData?.find(
               (i) => i._id == item._id.toString()
             );
+
             console.log("cartData", cartData);
-            console.log("items", item);
-            console.log("cartItem", cartItem);
-            console.log("cartData length", cartData?.length);
+            // console.log("items", item);
+            // console.log("cartItem", cartItem);
+            // console.log("cartData length", cartData?.length);
             return (
               <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -368,7 +371,7 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
                       <div className="bg-green-50  rounded-sm  flex items-center p-1">
                         <button
                           onClick={() => {
-                            handleQuantity("decrease", item._id);
+                            handleQuantity("decrease", item._id.toString());
                           }}
                           className="bg-green-200 text-green-600 rounded-sm mx-3">
                           <Minus className="h-5 w-5" />
@@ -376,7 +379,7 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
                         <span>{cartItem.cartquantity}</span>
                         <button
                           onClick={() => {
-                            handleQuantity("increase", item._id);
+                            handleQuantity("increase", item._id.toString());
                           }}
                           className="bg-green-200 text-green-600 rounded-sm mx-3">
                           <Plus className="h-5 w-5" />
@@ -389,6 +392,7 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
             );
           })}
         </motion.div>
+
       </div>
 
       <GroceryDetailCard
