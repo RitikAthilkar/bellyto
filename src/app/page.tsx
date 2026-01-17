@@ -8,6 +8,9 @@ import User from "@/models/user.model";
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import UserDashboard from "@/components/user/UserDashboard";
+import LocationUpdater from "@/components/LocationUpdater";
+import DeliveryBoyHome from "@/components/deliveryboy/DeliveryBoyHome";
+
 
 export default async function Home() {
   // await new Promise((resolve) => setTimeout(resolve, 300000));
@@ -54,6 +57,13 @@ export default async function Home() {
           <AdminHomePage user={safeUser} />
         </>
       )}
+      {user?.role == "deliveryBoy" && (
+        <>
+          <DeliveryBoyHome  />
+        </>
+      )}
+
+      <LocationUpdater userId={user._id} />
     </>
   );
 }

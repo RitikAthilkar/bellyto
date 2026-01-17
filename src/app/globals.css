@@ -63,4 +63,10 @@ button{
     border-radius: 30vw !important;
 }
 /* End Toast CSS */
+/* Tabs CSS */
+.data-\[state\=active\]\:shadow-sm[data-state="active"]{
+  background-color:#ffffff !important;
+  color: black !important;
+}
+/* End Tabs CSS */
 

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import {  ClipboardCheck,Package2, PlusCircle,  } from 'lucide-react';
 import Link from 'next/link'
 import AddGrocery from './addGrocery';
+import ManageOrder from './ManageOrder';
 
 const AdminProduct = () => {
     const [actionbtn, setActionBtn] = useState('')
@@ -43,18 +44,23 @@ const AdminProduct = () => {
               View Grocery
             </Link>
           </motion.li>
-          <motion.li
-            className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
-            whileTap={{ scale: 0.97 }}>
-            <ClipboardCheck />
-            <Link href="" className="ms-2">
-              Manage Order
-            </Link>
-          </motion.li>
+
+          {actionbtn != "manageorder" && (
+            <motion.li
+              className="bg-white text-sm text-gray-600 rounded-full p-2 font-semibold flex items-center  hover:bg-gray-200"
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActionBtn("manageorder")}>
+              <ClipboardCheck />
+              <Link href="" className="ms-2">
+                Manage Order
+              </Link>
+            </motion.li>
+          )}
         </ul>
       </div>
 
       {actionbtn == "addgrocery" && <AddGrocery />}
+      {actionbtn == "manageorder" && <ManageOrder />}
     </>
   );
 }

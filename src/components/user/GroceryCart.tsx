@@ -17,7 +17,7 @@ import { updateQuantity } from "@/redux/cartSlice";
 import atta from '@/asset/image/products/grocery/atta.png'
 import { Tooltip } from "react-tooltip";
 import axios from "axios";
-
+import { useRouter } from "next/navigation";
 const GroceryCart = ({
   open,
   onOpenChange,
@@ -25,7 +25,7 @@ const GroceryCart = ({
   open: boolean;
   onOpenChange:()=>void
 }) => {
-
+    const router = useRouter()
    const {cartData, subtotal, deliveryFee, finalTotal} = useSelector((state:RootState)=>state.cart)
 const dispatch = useDispatch<AppDispatch>()
 
@@ -179,7 +179,7 @@ const dispatch = useDispatch<AppDispatch>()
                   </p>
                 </div>
               
-                 <button className="bg-green-600 rounded-full p-2 text-lg text-white w-full mt-2">Proceed to checkout</button>
+                 <button onClick={()=>{router.push('/user/checkout')}}  className="bg-green-600 rounded-full p-2 text-lg text-white w-full mt-2">Proceed to checkout</button>
               
               </>
             ) : (
