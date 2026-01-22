@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/global-error.js"  ],
+, "src/global-error.js", "src/components/nav.tsx"  ],
   "exclude": ["node_modules"]
 }

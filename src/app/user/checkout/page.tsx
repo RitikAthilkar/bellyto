@@ -1,351 +1,430 @@
-'use client'
-import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
-import L,{ LatLngExpression } from "leaflet";
-import { RootState } from '@/redux/store';
-import { BuildingIcon, EarthIcon, HomeIcon, Loader2, LocateFixed, LocationEditIcon, Phone, Search, User } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+"use client";
+// import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+// import L,{ LatLngExpression } from "leaflet";
+import { SearchBox } from "@mapbox/search-js-react";
+import { RootState } from "@/redux/store";
+import {
+  BuildingIcon,
+  EarthIcon,
+  HomeIcon,
+  Loader2,
+  LocateFixed,
+  LocationEditIcon,
+  Phone,
+  Search,
+  User,
+} from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { useSelector } from "react-redux";
 import { MdDeliveryDining } from "react-icons/md";
 import dynamic from "next/dynamic";
 import axios from "axios";
-import {motion} from 'motion/react'
-import { OpenStreetMapProvider } from "leaflet-geosearch";
+import { motion, spring } from "motion/react";
+// import { OpenStreetMapProvider } from "leaflet-geosearch";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-interface IDelivery{
-    _id?:string,
-    name:string  ,
-    mobile:string ,
-    address:string,
-    city:string,
-    state:string,
-    pincode:string,
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+interface IDelivery {
+  _id?: string;
+  name: string;
+  mobile: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
 }
+
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
+
 const page = () => {
-    const MapContainer = dynamic(
+  const MapContainer = dynamic(
     () => import("react-leaflet").then((mod) => mod.MapContainer),
-    { ssr: false }
+    { ssr: false },
+  );
+
+  const { userData } = useSelector((state: RootState) => state.user);
+  const { cartData, subtotal, deliveryFee, finalTotal } = useSelector(
+    (state: RootState) => state.cart,
+  );
+
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [position, setPosition] = useState<[number, number] | null>(null);
+  const [searchloader, setSearchLoader] = useState(false);
+
+  const [form, setForm] = useState<IDelivery>({
+    name: "Fetching...",
+    mobile: "Fetching...",
+    address: "Fetching...",
+    city: "Fetching...",
+    state: "Fetching...",
+    pincode: "Fetching...",
+  });
+
+  const [inputValue, setInputValue] = useState("");
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
+
+
+
+  // const markerIcon = new L.Icon({
+  //   iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+  //   iconSize: [40, 40],
+  //   iconAnchor: [20, 40],
+  // });
+
+
+useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setPosition([latitude, longitude]);
+
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.setCenter([longitude, latitude]);
+
+          // If marker already exists, just update its position
+          if (markerRef.current) {
+            markerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            // Create marker for the first time
+            markerRef.current = new mapboxgl.Marker({ draggable: true })
+              .setLngLat([longitude, latitude])
+              .addTo(mapInstanceRef.current)
+              .on("dragend", (e) => {
+                const lngLat = e.target.getLngLat();
+                setSearchQuery('')
+                setPosition([lngLat.lat, lngLat.lng]);
+              });
+          }
+        }
+      },
+      (err) => console.log(`location error ${err}`),
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 100000 },
     );
-    const {userData} = useSelector((state:RootState)=>state.user)
-     const { cartData, subtotal, deliveryFee, finalTotal } = useSelector(
-       (state: RootState) => state.cart
-     );
+  }
+}, []);
 
-     const router = useRouter()
-    const [searchQuery, setSearchQuery] = useState("")
-    const [position, setPosition] = useState<[number,number] | null>(null)
-    const [searchloader, setSearchLoader] = useState(false)
-        const [form, setForm] = useState<IDelivery>({
-          name: "Fetching...",
-          mobile: "Fetching...",
-          address: "Fetching...",
-          city: "Fetching...",
-          state: "Fetching...",
-          pincode: "Fetching...",
-        });
+    useEffect(() => {
+    if (!mapContainerRef.current) return;
+    if (mapInstanceRef.current) return;
 
-    const notify = (msg: string) => toast(msg);
-    const markerIcon = new L.Icon({
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
+    mapInstanceRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      center: position ? [position[1], position[0]] : [0, 0],
+      zoom: 15,
+      style: "mapbox://styles/mapbox/streets-v12",
     });
-    useEffect(()=>{
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition((position)=>{
-                const {latitude, longitude} = position.coords 
-                setPosition([latitude,longitude])
-            },(err)=>{console.log(`location error ${err}`)},{enableHighAccuracy:true,maximumAge:0,timeout:100000})
-        }
-    },[])
 
-    useEffect(()=>{
-      const FetchAddress = async()=>{
-          if(!position)return
-          if(!userData)return
-          try {
-             const response = await axios.get(
-               `https://nominatim.openstreetmap.org/reverse?lat=${position[0]}&lon=${position[1]}&format=json`
-             );
-             const address = response.data
-             console.log("loction", response.data)
-             setForm({
-               ...form,
-               name: userData.name,
-               mobile: userData.mobile || "",
-               address: address.display_name,
-               city: address.address.state_district,
-               state: address.address.state,
-               pincode: address.address.postcode,
-             });
-          } catch (error) {
-            console.log("loction api error", error);
-          }
-      }
-      FetchAddress();
-    },[position,userData])
+    return () => {
+      mapInstanceRef.current?.remove();
+      mapInstanceRef.current = null;
+    };
+  }, []);
 
-    const DraggableMarker:React.FC=()=>{
-            const map = useMap()
-            useEffect(()=>{
-             map.setView(position as LatLngExpression,15,{animate:true})
-            },[position,map])
-        return (
-          <>
-            <Marker icon={markerIcon} position={position as LatLngExpression} draggable={true} 
-             eventHandlers={{
-                dragend:(e:L.LeafletEvent)=>{
-                   const marker = e.target as L.Marker
-                   const {lat,lng} = marker.getLatLng()
-                   setPosition([lat,lng])
-                }
-             }}
-            />
-          </>
+  useEffect(() => {
+    const FetchAddress = async () => {
+      if (!position) return;
+      if (!userData) return;
+      try {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?lat=${position[0]}&lon=${position[1]}&format=json`,
         );
-    }
+        const address = response.data;
+        setForm({
+          ...form,
+          name: userData.name,
+          mobile: userData.mobile || "",
+          address: searchQuery!==''? searchQuery: address.display_name || " ",
+          city: address.address.state_district,
+          state: address.address.state,
+          pincode: address.address.postcode,
+        });
+      } catch (error) {
+        console.log("loction api error", error);
+      }
+    };
+    FetchAddress();
+  }, [position, userData]);
 
-    const handleSearch= async()=>{
-        setSearchLoader(true)
-        const provider = new OpenStreetMapProvider();
-        const results = await provider.search({ query: searchQuery });
-        if(results){
-            setSearchLoader(false)
-            setPosition([results[0].y,results[0].x])
-        }
-    }
+const handleSearchChange = (value: string) => {
+  if (!value) return;
 
-    const handlecurrentLocation= async()=>{
-         if (navigator.geolocation) {
-           navigator.geolocation.getCurrentPosition(
-             (position) => {
-               const { latitude, longitude } = position.coords;
-               setPosition([latitude, longitude]);
-             },
-             (err) => {
-               console.log(`location error ${err}`);
-             },
-             { enableHighAccuracy: true, maximumAge: 0, timeout: 100000 }
-           );
-         }
-    }
+  axios
+    .get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        value,
+      )}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&country=IN&limit=1`,
+    )
+    .then((res) => {
+      const first = res.data.features[0];
+      if (!first) return;
 
-    const handleChange = (e:React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>)=>{
-       const {name,value}=e.target
-       setForm({
-        ...form,
-        [name]:value
-       })
-    }
+      const [lng, lat] = first.geometry.coordinates;
+
+      // Move existing marker
+      if (markerRef.current) {
+        markerRef.current.setLngLat([lng, lat]);
+      } else if (mapInstanceRef.current) {
+        markerRef.current = new mapboxgl.Marker({ draggable: true })
+          .setLngLat([lng, lat])
+          .addTo(mapInstanceRef.current)
+          .on("dragend", (e) => {
+            const lngLat = e.target.getLngLat();
+            setPosition([lngLat.lat, lngLat.lng]);
+
+            // Update form address on drag as well
+            setSearchQuery(first.place_name);
+            // setForm((prev) => ({
+            //   ...prev,
+            //   address: first.place_name,
+            // }));
+          });
+      }
+
+      // Center map
+      mapInstanceRef.current!.setCenter([lng, lat]);
+
+      // Update position state
+      setPosition([lat, lng]);
+
+      // ✅ Update form address
+      setSearchQuery(first.place_name);
+      // setForm((prev) => ({
+      //   ...prev,
+      //   address: first.place_name,
+      // }));
+
+      // Update search input
+      setInputValue(first.place_name);
+    })
+    .catch((err) => console.log("Geocoding error", err));
+};
 
 
-    const handleOrder = async ()=>{
-          if(!userData || !cartData || !form || !position)return
-    
+const handlecurrentLocation = async () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setPosition([latitude, longitude]);
 
-          try {
-             const response = await axios.post("/api/order", {
-               userId: userData._id,
-               items: cartData.map((i) => ({
-                 product: i._id,
-                 name: i.name,
-                 sku: i.sku,
-                 description: i.description,
-                 category: i.category,
-                 subcategory: i.subcategory,
-                 brand: i.brand,
-                 price: i.price,
-                 mrp: i.mrp,
-                 unitquantity: i.unitquantity,
-                 unit: i.unit,
-                 image: i.image,
-                 stockquantity: i.stockquantity,
-                 cartquantity: i.cartquantity,
-                 discountpercent: i.discountpercent,
-                 tag: i.tag,
-               })),
-               address: {
-                 name: form.name,
-                 mobile: form.mobile,
-                 fulladdress: form.address,
-                 city: form.city,
-                 state: form.state,
-                 pincode: form.pincode,
-                 latitude: position[0],
-                 longitude: position[1],
-               },
-               totalAmount: finalTotal,
-               paymentMethod: "cod",
-               status: "pending",
-               paymentStatus: false,
-             });
-             if(response.status==200){
-                  router.push("/user/order-placed")
+        if (mapInstanceRef.current) {
+          // Center map
+          mapInstanceRef.current.setCenter([longitude, latitude]);
 
-             }
-          } catch (error) {
-            
+          // Move existing marker or create if not exists
+          if (markerRef.current) {
+            markerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            markerRef.current = new mapboxgl.Marker({ draggable: true })
+              .setLngLat([longitude, latitude])
+              .addTo(mapInstanceRef.current)
+              .on("dragend", (e) => {
+                const lngLat = e.target.getLngLat();
+                setSearchQuery('')
+                setPosition([lngLat.lat, lngLat.lng]);
+              });
           }
-    }
-    // useEffect(()=>{
-    //     if(!userData)return
-    //     setForm({
-    //        ...form,
-    //        name:userData.name,
-    //        mobile:userData.mobile || "",
-    //     })
-    // },[userData])
+        }
+      },
+      (err) => {
+        console.log(`location error ${err}`);
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 100000 },
+    );
+  }
+};
+
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const handleOrder = async () => {
+    if (!userData || !cartData || !form || !position) return;
+    try {
+      const response = await axios.post("/api/order", {
+        userId: userData._id,
+        items: cartData.map((i) => ({
+          product: i._id,
+          name: i.name,
+          sku: i.sku,
+          description: i.description,
+          category: i.category,
+          subcategory: i.subcategory,
+          brand: i.brand,
+          price: i.price,
+          mrp: i.mrp,
+          unitquantity: i.unitquantity,
+          unit: i.unit,
+          image: i.image,
+          stockquantity: i.stockquantity,
+          cartquantity: i.cartquantity,
+          discountpercent: i.discountpercent,
+          tag: i.tag,
+        })),
+        address: {
+          name: form.name,
+          mobile: form.mobile,
+          fulladdress: form.address,
+          city: form.city,
+          state: form.state,
+          pincode: form.pincode,
+          latitude: position[0],
+          longitude: position[1],
+        },
+        totalAmount: finalTotal,
+        paymentMethod: "cod",
+        status: "pending",
+        paymentStatus: false,
+      });
+      if (response.status == 200) {
+        router.push("/user/order-placed");
+      }
+    } catch (error) {}
+  };
+
   return (
     <>
+      {/* {searchQuery}
+      {JSON.stringify(form?.address)} */}
       <div className="min-h-screen w-full px-5 flex flex-col justify-start items-center bg-gray-100">
-        <div className="grid grid-cols-12 w-[80vw] py-15">
-          <div className="relative col-span-12 flex justify-center items-center mb-3">
-            <h3 className="text-3xl font-semibold text-black">CHECKOUT</h3>
-            <h3 className="absolute left-0 text-base text-black font-semibold">
-              <i className="bi bi-arrow-left me-1"></i>Go Back
-            </h3>
-            {/* <h3 className="text-xl font-semibold">{JSON.stringify(form)}</h3> */}
-          </div>
+        <div className="grid grid-cols-12 w-[70vw] py-15">
           <div className="col-span-6 p-2 ">
             <div className="shadow-lg border border-gray-200 rounded-2xl bg-white p-4">
-              <h2 className="text-lg font-semibold">
-                <i className="bi bi-geo-alt-fill me-2"></i>Delivery Address
-              </h2>
-              <form>
-                <div className="relative flex items-center p-2 px-3">
-                  <div className="relative flex items-center  w-full me-1  ">
-                    <Search className="absolute top-3 left-4 text-gray-500 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Search Location"
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                      }}
-                      className="border pl-12  p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                    />
-                  </div>
+              <div className="relative h-[50vh] w-full p-2 ">
+                <div
+                  ref={mapContainerRef}
+                  className="h-full w-full rounded-lg"
+                />
+                <div className="absolute top-1 right-0 flex items-center p-2 px-3">
+                  <SearchBox
+                    accessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+                    map={mapInstanceRef.current ?? undefined}
+                    mapboxgl={mapboxgl}
+                    value={inputValue}
+                    onChange={(val) => setInputValue(val)}
+                    options={{
+                      language: "en",
+                      country: "IN",
+                    }}
+                  />
                   <button
-                    className="p-2 bg-green-600 text-white rounded-lg m-3 mx-0"
                     type="button"
-                    onClick={handleSearch}>
-                    {searchloader ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      "Search"
-                    )}
+                    onClick={() => handleSearchChange(inputValue)}
+                    className="ml-2 p-2 bg-green-600 text-white rounded-md">
+                    <Search/>
                   </button>
                 </div>
-                <div className="relative h-[40vh] w-full p-2 ">
-                  {position &&
-                    (!searchloader ? (
-                      <>
-                        <MapContainer
-                          center={position as LatLngExpression}
-                          zoom={13}
-                          scrollWheelZoom={true}
-                          className="h-full w-full rounded-lg">
-                          <TileLayer
-                            attribution="&copy; OpenStreetMap contributors"
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          />
-                          <DraggableMarker />
-                        </MapContainer>
+                <motion.button
+                  onClick={handlecurrentLocation}
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  className="absolute right-2 bottom-2 bg-green-600 text-xl z-50 p-2 text-white rounded-full">
+                  <LocateFixed />
+                </motion.button>
+              </div>
 
-                        <motion.button
-                          onClick={handlecurrentLocation}
-                          type="button"
-                          whileTap={{ scale: 0.97 }}
-                          className="absolute right-2 bottom-2 bg-green-600 text-xl z-99999 p-2 text-white rounded-full">
-                          <LocateFixed />
-                        </motion.button>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full">
-                        <Loader2 className="animate-spin text-xl" />
-                        <h3 className="text-lg">Loading</h3>
-                      </div>
-                    ))}
-                </div>
-                <div className="relative flex items-center  w-full p-2 px-3">
-                  <User className="absolute left-5 text-gray-500 h-5" />
-                  <input
-                    className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                    type="text"
-                    value={form.name ? form.name : ""}
-                    placeholder="Your Name"
-                    name="name"
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="relative flex items-center  w-full p-2 px-3">
-                  <Phone className="absolute left-5 text-gray-500 h-5" />
-                  <input
-                    className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                    type="text"
-                    value={form ? form.mobile : ""}
-                    placeholder="Mobile Number"
-                    name="mobile"
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="relative flex items-center  w-full p-2 px-3">
-                  <HomeIcon className="absolute top-5.5 left-5 text-gray-500 h-5" />
-                  <textarea
-                    className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                    placeholder="Address"
-                    name="address"
-                    value={form ? form.address : ""}
-                    onChange={handleChange}
-                    required></textarea>
-                </div>
-                <div className="grid grid-cols-12 p-2  w-full">
-                  <div className="col-span-4 p-1">
-                    <div className="relative flex items-center  w-full  ">
-                      <BuildingIcon className="absolute left-4 text-gray-500 h-5" />
-                      <input
-                        className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                        type="text"
-                        placeholder="City"
-                        name="city"
-                        value={form ? form.city : ""}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="col-span-4 p-1">
-                    <div className="relative flex items-center  w-full ">
-                      <LocationEditIcon className="absolute left-4 text-gray-500 h-5" />
-                      <input
-                        className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                        type="text"
-                        value={form ? form.state : ""}
-                        placeholder="State"
-                        name="city"
-                        required
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-span-4 p-1">
-                    <div className="relative flex items-center  w-full ">
-                      <EarthIcon className="absolute left-4 text-gray-500 h-5" />
-                      <input
-                        className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                        type="text"
-                        placeholder="Pincode"
-                        name="state"
-                        value={form ? form.pincode : ""}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+              {/* ---- ALL YOUR FORM FIELDS BELOW KEPT AS IT IS ---- */}
+
+              <div className="relative flex items-center  w-full p-2 px-3">
+                <User className="absolute left-5 text-gray-500 h-5" />
+                <input
+                  className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                  type="text"
+                  value={form.name ? form.name : ""}
+                  placeholder="Your Name"
+                  name="name"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center  w-full p-2 px-3">
+                <Phone className="absolute left-5 text-gray-500 h-5" />
+                <input
+                  className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                  type="text"
+                  value={form ? form.mobile : ""}
+                  placeholder="Mobile Number"
+                  name="mobile"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center  w-full p-2 px-3">
+                <HomeIcon className="absolute top-5.5 left-5 text-gray-500 h-5" />
+                <textarea
+                  className="border pl-10 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                  placeholder="Address"
+                  name="address"
+                  value={searchQuery !== "" ? searchQuery : form?.address || ""}
+                  onChange={handleChange}
+                  required></textarea>
+              </div>
+
+              <div className="grid grid-cols-12 p-2  w-full">
+                <div className="col-span-4 p-1">
+                  <div className="relative flex items-center  w-full  ">
+                    <BuildingIcon className="absolute left-4 text-gray-500 h-5" />
+                    <input
+                      className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                      type="text"
+                      placeholder="City"
+                      name="city"
+                      value={form ? form.city : ""}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
                 </div>
-              </form>
+
+                <div className="col-span-4 p-1">
+                  <div className="relative flex items-center  w-full ">
+                    <LocationEditIcon className="absolute left-4 text-gray-500 h-5" />
+                    <input
+                      className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                      type="text"
+                      value={form ? form.state : ""}
+                      placeholder="State"
+                      name="state"
+                      required
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-span-4 p-1">
+                  <div className="relative flex items-center  w-full ">
+                    <EarthIcon className="absolute left-4 text-gray-500 h-5" />
+                    <input
+                      className="border pl-12 px-3 p-2 rounded-md text-base w-full border-gray-300 focus:ring-1 focus:ring-purple-600 focus:outline-none"
+                      type="text"
+                      placeholder="Pincode"
+                      name="pincode"
+                      value={form ? form.pincode : ""}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ---- ALL YOUR FORM FIELDS ABOVE KEPT AS IT IS ---- */}
             </div>
           </div>
           <div className="col-span-6 p-2 ">
@@ -430,10 +509,14 @@ const page = () => {
                     </button>
                   </div>
                 </div>
-
-                <button onClick={handleOrder} type="button" className="bg-green-600 rounded-full p-2 text-lg text-white w-full mt-2">
+                {/* onClick={handleOrder}  */}
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  type="button"
+                  onClick={handleOrder}
+                  className="bg-green-600 hover:bg-green-700 rounded-full p-2 text-lg text-white w-full mt-2">
                   Place Order
-                </button>
+                </motion.button>
               </form>
             </div>
           </div>
@@ -441,6 +524,6 @@ const page = () => {
       </div>
     </>
   );
-}
+};
 
-export default page
+export default page;

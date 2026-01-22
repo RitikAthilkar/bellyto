@@ -26,6 +26,9 @@ const nextConfig: NextConfig = {
     },
     ],
   },
+
+  transpilePackages: ['react-map-gl']
+
 };
 
 export default nextConfig;

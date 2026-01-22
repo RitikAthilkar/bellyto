@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import connectDb from "@/config/db";
+import EmitEventHandler from "@/config/emitEventHandler";
 import Order from "@/models/order.model";
 import User from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -37,7 +38,7 @@ export async function POST(req:NextRequest){
          status,
 
        })
-
+      await EmitEventHandler("new-order",neworder)
        return NextResponse.json(
             {message:"Order Placed successfully"},
             {status:200}

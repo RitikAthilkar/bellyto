@@ -317,15 +317,14 @@ const GroceryItemCard = ({ products }: { products: IProduct[] }) => {
                 className="flex flex-col justify-center items-center h-85 w-80 p-4 shrink-0 shadow-lg rounded-2xl shadow-gray-300  cursor-pointer"
                 key={index}>
                 <div
-                  className="relative h-50 w-50 "
+                  className="relative  "
                   onClick={() => {
                     hadleCardDetails(item._id.toString());
                   }}>
-                  <Image
+                  <img
                     src={item.image}
-                    alt="product image"
-                    fill
-                    className=" z-0"
+                    alt="product image "
+                    className=" z-0 h-40"
                   />
                 </div>
 

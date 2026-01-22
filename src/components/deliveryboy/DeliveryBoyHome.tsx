@@ -4,6 +4,7 @@ import connectDb from "@/config/db";
 import { json } from "stream/consumers";
 import DeliveryBoyDashboard from "./DeliveryBoyDashboard";
 
+
 const DeliveryBoyHome = async () => {
   await connectDb();
   const products = await Grocery.find({});
@@ -12,6 +13,7 @@ const DeliveryBoyHome = async () => {
   return (
     <>
       <DeliveryBoyDashboard  />
+     
     </>
   );
 };

@@ -63,7 +63,7 @@ export default async function Home() {
         </>
       )}
 
-      <LocationUpdater userId={user._id} />
+      <LocationUpdater userId={safeUser.id} />
     </>
   );
 }

@@ -1,4 +1,5 @@
 import connectDb from "@/config/db";
+import EmitEventHandler from "@/config/emitEventHandler";
 import DeliveryAssignment from "@/models/deliveryAssignment.model";
 import Order from "@/models/order.model";
 import User from "@/models/user.model";
@@ -24,9 +25,10 @@ export async function POST(req:NextRequest){
                 {status:400}
             )
         }
-
+// && !order.assignment
         let Deliveryboypayload:any = []
-        if(status=='ready for dispatch' && !order.assignment){
+        if(status=='ready to dispatch' && !order.assignment){
+             
              const {latitude, longitude} = order.address[0]
                 if (!latitude || !longitude) {
                 return NextResponse.json(
@@ -56,6 +58,7 @@ export async function POST(req:NextRequest){
              )
 
              var candidates = availableDeliveryboy.map(i=>i._id)
+    
  
              if(candidates.length==0){
                 await order.save();
@@ -70,8 +73,11 @@ export async function POST(req:NextRequest){
                 brodcastedTo:candidates,
                 status:"brodcasted"
              })
+
             order.assignment = deliveryAssignment._id
             order.status = status
+            await deliveryAssignment.populate("order")
+            
             Deliveryboypayload = await availableDeliveryboy.map(i=>({
                  id:i._id,
                  name:i.name,
@@ -79,8 +85,20 @@ export async function POST(req:NextRequest){
                  latitude:i.location.coordinates[1],
                  longitude:i.location.coordinates[1]
             }))
-            await deliveryAssignment.populate("order")
 
+            
+            for(const id of candidates){
+                const boy = await User.findById(id)
+                if(boy.socketId){
+                  var res = await EmitEventHandler("new-assgnment",deliveryAssignment,boy.socketId)
+                }
+            }
+        //    return NextResponse.json(
+        //         {message:`socket response ${JSON.stringify(res)}`},
+        //         {status:200}
+        //     )
+
+            await deliveryAssignment.save()
         }else{
             order.status=status
             await order.save()
